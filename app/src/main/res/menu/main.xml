@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/video_status"
+        android:icon="@drawable/androidmkab_logo"
+        android:title="@string/video_status"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/text_status"
+        android:icon="@drawable/androidmkab_logo"
+        android:title="@string/text_status"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/image_status"
+        android:icon="@drawable/androidmkab_logo"
+        android:title="@string/image_status"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/gif_status"
+        android:icon="@drawable/androidmkab_logo"
+        android:title="@string/gif_status"
+        app:showAsAction="never" />
+
+</menu>
