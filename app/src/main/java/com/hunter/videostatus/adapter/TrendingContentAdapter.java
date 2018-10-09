@@ -15,6 +15,7 @@ import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,8 +24,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hunter.videostatus.R;
+import com.hunter.videostatus.listeners.OnPopUpShareListener;
 import com.hunter.videostatus.model.Status;
 import com.hunter.videostatus.ui.activity.VideoDetailScreen;
+import com.hunter.videostatus.ui.fragments.TrendingContentFragment;
 import com.hunter.videostatus.util.ColorGenerator;
 import com.hunter.videostatus.util.Utility;
 import com.squareup.picasso.Callback;
@@ -39,6 +42,7 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private final Context context;
     private ArrayList<Status.DataBean> results = new ArrayList<>();
     private String type = "Video";
+    private OnPopUpShareListener onShareClickListener;
 
     public TrendingContentAdapter(Context context) {
         this.context = context;
@@ -67,6 +71,7 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 Utility.loadImageFromGlide(context, dataBean.getImgurl(), holder.imageView);
                 holder.playButton.setVisibility(View.VISIBLE);
             } else if (type.equals("Text")) {
+                holder.copyLayout.setVisibility(View.VISIBLE);
                 holder.moreAction.setVisibility(View.GONE);
                 holder.shareLayout.setVisibility(View.VISIBLE);
                 holder.title.setVisibility(View.VISIBLE);
@@ -74,8 +79,9 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 holder.playButton.setVisibility(View.GONE);
                 holder.itemView.setBackgroundColor(ColorGenerator.MATERIAL.getRandomColor());
             } else {
+                holder.copyLayout.setVisibility(View.GONE);
                 holder.moreAction.setVisibility(View.GONE);
-                holder.shareLayout.setVisibility(View.GONE);
+                holder.shareLayout.setVisibility(View.VISIBLE);
                 holder.title.setVisibility(View.VISIBLE);
                 holder.title.setText(dataBean.getTextstatus());
                 holder.playButton.setVisibility(View.GONE);
@@ -94,7 +100,12 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         return results.size() == 0 ? 0 : results.size() + 1;
     }
 
+    public void setOnShareClickListener(OnPopUpShareListener onShareClickListener) {
+        this.onShareClickListener = onShareClickListener;
+    }
+
     public class MainViewHolder extends RecyclerView.ViewHolder {
+        private final View shareButton;
         private ImageView imageView;
         private ImageView playButton;
         private TextView title;
@@ -104,11 +115,13 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private ImageView messangerButton;
         private ImageView instagramButton;
         private ImageView whatsAppButton;
+        private View copyLayout;
 
         private ImageView moreAction;
 
         public MainViewHolder(final View itemView) {
             super(itemView);
+            copyLayout = itemView.findViewById(R.id.copy_layout);
             moreAction = itemView.findViewById(R.id.more_action);
             shareLayout = itemView.findViewById(R.id.sharing_layout);
             imageView = itemView.findViewById(R.id.video_image);
@@ -119,6 +132,7 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             messangerButton = itemView.findViewById(R.id.send_to_facebook);
             instagramButton = itemView.findViewById(R.id.send_to_instagram);
             whatsAppButton = itemView.findViewById(R.id.send_to_whatsapp);
+            shareButton = itemView.findViewById(R.id.share);
 
             ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
                 @Override
@@ -139,10 +153,10 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 moreAction.setBackground(p);
             }
+
             moreAction.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     if (type.equals("Video")) {
                         showPopUpMenu(results.get(getLayoutPosition()),v);
                     }
@@ -210,25 +224,66 @@ public class TrendingContentAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
             });
 
+            shareButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, results.get(getLayoutPosition()).getTextstatus());
+                    sendIntent.setType("text/plain");
+                    context.startActivity(Intent.createChooser(sendIntent, "sharing..."));
+                    try {
+                        itemView.getContext().startActivity(sendIntent);
+                    } catch (ActivityNotFoundException ex) {
+                    }
+                }
+            });
+
             itemView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
                     if (type.equals("Video")) {
-                        itemView.getContext().startActivity(new Intent(itemView.getContext(), VideoDetailScreen.class).putExtra("item", results.get(getLayoutPosition()))
-                                .putParcelableArrayListExtra("remaining_list", results));
+                        onShareClickListener.onItemClick(results.get(getLayoutPosition()),results);
                     }
                 }
             });
         }
     }
 
-    private void showPopUpMenu(Status.DataBean bean, View v) {
+    private void showPopUpMenu(final Status.DataBean bean, View v) {
         PopupMenu popupMenu = new PopupMenu(context, v);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             popupMenu.setGravity(Gravity.TOP);
         }
-        popupMenu.inflate(R.menu.menu_drawer);
+        popupMenu.inflate(R.menu.menu_share);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                switch (item.getItemId()) {
+
+                    case R.id.fb_messanger:
+                        onShareClickListener.onMessangerClick(bean);
+                        break;
+
+                    case R.id.whatsapp:
+                        onShareClickListener.onWhatsUpClick(bean);
+                        break;
+
+                    case R.id.instagram:
+                        onShareClickListener.onInstaClick(bean);
+                        break;
+
+                    case R.id.share:
+                        onShareClickListener.onFacebookClick(bean);
+                        break;
+
+                }
+                return false;
+            }
+        });
         popupMenu.show();
     }
 

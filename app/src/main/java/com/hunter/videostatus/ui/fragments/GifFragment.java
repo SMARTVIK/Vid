@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.hunter.videostatus.R;
 import com.hunter.videostatus.adapter.GifAdapter;
@@ -24,6 +26,7 @@ import com.hunter.videostatus.ui.activity.MainActivity;
 import com.hunter.videostatus.ui.activity.SpacesItemDecoration;
 import com.hunter.videostatus.util.Utility;
 import com.hunter.videostatus.vidstatus.Api;
+import com.hunter.videostatus.vidstatus.Constant;
 import com.hunter.videostatus.vidstatus.StatusApi;
 
 import java.util.Collection;
@@ -52,15 +55,15 @@ public class GifFragment extends Fragment implements OnItemClickListener {
     }
 
     private void setUpAdd() {
-        /*mInterstitialAd = new InterstitialAd(getContext());
-        mInterstitialAd.setAdUnitId("ca-app-pub-3748283843614648/4463718103");
+        mInterstitialAd = new InterstitialAd(getContext());
+        mInterstitialAd.setAdUnitId(Constant.GIF_CONTENT);
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
                 mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
-        });*/
+        });
     }
 
     private void getGifCategories() {
@@ -112,11 +115,11 @@ public class GifFragment extends Fragment implements OnItemClickListener {
 
     @Override
     public void onItemClick(GifCategories.DataBean dataBean) {
-        /*if (mInterstitialAd.isLoaded()) {
+        if (mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
-        }*/
+        }
         startActivity(new Intent(getContext(), MainActivity.class).putExtra("cat_id", dataBean.getCat_id()).putExtra("cat_name", dataBean.getCat_name()));
     }
 }

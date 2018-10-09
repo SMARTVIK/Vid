@@ -8,11 +8,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.hunter.videostatus.BuildConfig;
 import com.hunter.videostatus.R;
 import com.hunter.videostatus.ui.fragments.GetContentByCategoryId;
+import com.hunter.videostatus.vidstatus.Constant;
 
 public class ContentByCategory extends AppCompatActivity {
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,11 +30,18 @@ public class ContentByCategory extends AppCompatActivity {
         }
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+//        loadAd();
         String catString = getIntent().getStringExtra("category");
         getSupportActionBar().setTitle(getIntent().getStringExtra("cat_name"));
         String catId = getIntent().getStringExtra("cat_id");
         GetContentByCategoryId catByIdFragment = new GetContentByCategoryId();
         catByIdFragment.addTag(catString, catId);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container,catByIdFragment,null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, catByIdFragment, null).commit();
+    }
+
+    private void loadAd() {
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 }

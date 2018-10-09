@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.ads.InterstitialAd;
 import com.hunter.videostatus.R;
 import com.hunter.videostatus.adapter.LatestVideoAdapter;
 import com.hunter.videostatus.adapter.VideoListAdapter;
@@ -56,19 +57,22 @@ public class VideoDetailScreen extends AppCompatActivity implements OnVideoClick
     private VideoListAdapter adapter;
     private EndlessRecyclerViewScrollListener scrollListener;
     private Status.DataBean currentVideo;
+    private InterstitialAd mInterstitialAd;
+    private int stopPosition;
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (currentVideo != null) {
-            mVideoView.resume();
-        }
-    }
-
-    @Override
-    protected void onPause() {
+    public void onPause() {
+        Log.d(TAG, "onPause called");
         super.onPause();
+        stopPosition = mVideoView.getCurrentPosition(); //stopPosition is an int
         mVideoView.pause();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume called");
+        mVideoView.start(); //Or use resume() if it doesn't work. I'm not sure
+        mVideoView.seekTo(stopPosition);
     }
 
     @Override
@@ -127,6 +131,15 @@ public class VideoDetailScreen extends AppCompatActivity implements OnVideoClick
         mVideoView.setVideoPath(currentVideo.getVideourl());
         mVideoView.start();
         initShareLayout();
+         /*mInterstitialAd = new InterstitialAd(getContext());
+        mInterstitialAd.setAdUnitId("ca-app-pub-3748283843614648/4463718103");  //video detail screen ad
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        });*/
     }
 
     private void initShareLayout() {
@@ -195,6 +208,7 @@ public class VideoDetailScreen extends AppCompatActivity implements OnVideoClick
             progressDialog.setMax(0);
             progressDialog.setProgress(0);
             progressDialog.setCancelable(false);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressDialog.show();
         }
 
@@ -271,7 +285,6 @@ public class VideoDetailScreen extends AppCompatActivity implements OnVideoClick
             return filepath;
         }
 
-
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -279,27 +292,30 @@ public class VideoDetailScreen extends AppCompatActivity implements OnVideoClick
             Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
             whatsappIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
             whatsappIntent.setType("*/*");
-//            String packageName = Utility.getPackageName(current);
-//            whatsappIntent.setPackage(packageName);
             Uri photoURI = FileProvider.getUriForFile(VideoDetailScreen.this, getApplicationContext().getPackageName() + ".fileprovider", new File(s));
             whatsappIntent.putExtra(Intent.EXTRA_STREAM, photoURI);
             whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             whatsappIntent.setAction(ACTION_SEND);
-            startActivity(Intent.createChooser(whatsappIntent, "sharing video file"));
-            /*try {
-                startActivity(whatsappIntent);
-            } catch (android.content.ActivityNotFoundException ex) {
+            if(current == 4){
+                startActivity(Intent.createChooser(whatsappIntent, "sharing video file"));
+            }else{
+                String packageName = Utility.getPackageName(current);
+                whatsappIntent.setPackage(packageName);
                 try {
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setData(Uri.parse("market://details?id=" + packageName));
-                    startActivity(intent);
-                } catch (Exception e) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
-                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    startActivity(whatsappIntent);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setData(Uri.parse("market://details?id=" + packageName));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
+                        intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                 }
-            }*/
+            }
         }
     }
 }

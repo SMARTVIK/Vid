@@ -27,6 +27,7 @@
 
         <TextView
             android:id="@+id/title_text"
+            android:padding="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -40,7 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:padding="10dp"
-            android:background="@drawable/cat_bg"
             android:src="@drawable/more_active"
             android:tint="#ffffff" />
 
@@ -54,6 +54,7 @@
         android:paddingTop="5dp">
 
         <LinearLayout
+            android:id="@+id/copy_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

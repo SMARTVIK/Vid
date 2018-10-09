@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VikWall</string>
+    <string name="app_name">Status Ji</string>
 
     <!--tab name-->
     <string name="tab1">Categories</string>
@@ -97,5 +97,12 @@
     <string name="gif_status">Gif Status</string>
     <string name="internet_error">No Internet Connection</string>
     <string name="app_folder_name">api</string>
+    <string name="fb_messanger">Messanger</string>
+    <string name="instagram">Instagram</string>
+    <string name="whatsapp">Whatsapp</string>
+    <string name="Share">Share</string>
+    <string name="main_screen_ad">ca-app-pub-3748283843614648/2824075637</string>
+    <string name="main_screen_ad_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="get_content_screen_id">ca-app-pub-3748283843614648/8942761428</string>
 
 </resources>

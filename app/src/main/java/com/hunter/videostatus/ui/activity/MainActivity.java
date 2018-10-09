@@ -98,24 +98,6 @@ public class MainActivity extends AppCompatActivity implements OnShareItemsListe
         return getIntent().getStringExtra("cat_name");
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(menuItem);
-        }
-    }
-
     private void setUpList() {
         RecyclerView gifList = findViewById(R.id.rv_latest_video_status);
         gifList.addItemDecoration(new SpacesItemDecoration(10));
@@ -168,9 +150,9 @@ public class MainActivity extends AppCompatActivity implements OnShareItemsListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == 100 && grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 100 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-            switch (current){
+            switch (current) {
 
                 case 1:
                     onWhatsUpClick(data);
@@ -307,23 +289,27 @@ public class MainActivity extends AppCompatActivity implements OnShareItemsListe
             Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
             whatsappIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
             whatsappIntent.setType("image/*");
-            String packageName = Utility.getPackageName(current);
-            whatsappIntent.setPackage(packageName);
             Uri photoURI = FileProvider.getUriForFile(MainActivity.this, getApplicationContext().getPackageName() + ".fileprovider", new File(s));
             whatsappIntent.putExtra(Intent.EXTRA_STREAM, photoURI);
             whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            try {
-                startActivity(whatsappIntent);
-            } catch (android.content.ActivityNotFoundException ex) {
+            if (current == 4) {
+                startActivity(Intent.createChooser(whatsappIntent, "sharing Gif file"));
+            } else {
+                String packageName = Utility.getPackageName(current);
+                whatsappIntent.setPackage(packageName);
                 try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("market://details?id=" + packageName));
-                    startActivity(intent);
-                } catch (Exception e) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
-                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    startActivity(whatsappIntent);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setData(Uri.parse("market://details?id=" + packageName));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
+                        intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                 }
             }
         }

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.hunter.videostatus.BuildConfig;
 import com.hunter.videostatus.R;
 import com.hunter.videostatus.adapter.CategoryAdapter;
 import com.hunter.videostatus.listeners.EndlessRecyclerViewScrollListener;
@@ -22,6 +23,7 @@ import com.hunter.videostatus.ui.activity.ContentByCategory;
 import com.hunter.videostatus.ui.activity.SpacesItemDecoration;
 import com.hunter.videostatus.util.Utility;
 import com.hunter.videostatus.vidstatus.Api;
+import com.hunter.videostatus.vidstatus.Constant;
 import com.hunter.videostatus.vidstatus.StatusApi;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ import retrofit2.Response;
 
 public class CategoryFragment extends Fragment implements OnItemClick {
 
-    private static final String TAG = TrendingContentFragment.class.getSimpleName();
+    private static final String TAG = CategoryFragment.class.getSimpleName();
     private String catString;
     private RecyclerView listOfItems;
     private InterstitialAd mInterstitialAd;
@@ -52,15 +54,15 @@ public class CategoryFragment extends Fragment implements OnItemClick {
         mRootView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_content, container, false);
         initViews(mRootView);
         getLatestVideoStatus(1);
-        /*mInterstitialAd = new InterstitialAd(getContext());
-        mInterstitialAd.setAdUnitId("ca-app-pub-3748283843614648/4463718103");
+        mInterstitialAd = new InterstitialAd(getContext());
+        mInterstitialAd.setAdUnitId(BuildConfig.DEBUG?Constant.TEST_INTERSTITIAL:Constant.CATEGORY_CONTENT);
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
                 mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
-        });*/
+        });
         return mRootView;
     }
 
@@ -145,11 +147,11 @@ public class CategoryFragment extends Fragment implements OnItemClick {
 
     @Override
     public void onItemClick(CategoryModel.DataBean dataBean) {
-        /*if (mInterstitialAd.isLoaded()) {
+        if (mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
-        }*/
+        }
         startActivity(new Intent(getContext(), ContentByCategory.class).putExtra("cat_id", dataBean.getCategory_id())
                                                                        .putExtra("category", catString)
                                                                        .putExtra("cat_name",dataBean.getCategory_name()));

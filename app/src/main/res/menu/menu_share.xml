@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/fb_messanger"
+        android:icon="@drawable/ic_home"
+        android:title="@string/fb_messanger" />
+
+    <item
+        android:id="@+id/instagram"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/instagram" />
+
+    <item
+        android:id="@+id/whatsapp"
+        android:icon="@drawable/ic_youtube"
+        android:title="@string/whatsapp" />
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_youtube"
+        android:title="@string/Share" />
+
+</menu>
